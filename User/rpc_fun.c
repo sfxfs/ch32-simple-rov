@@ -8,8 +8,13 @@
 #include "debug.h"
 #include "cJSON.h"
 #include "rpc_cjson.h"
+#include "sensor.h"
 #include <stdlib.h>
 #include <string.h>
+
+extern jy901_t jy901;
+extern float ms5837_temperature;
+extern float ms5837_depth;
 
 /**
  * @brief 获取 json 内对应值
@@ -41,8 +46,15 @@ static int rpc_manual_ctrl(double x, double y, double z, double r)
 
 static cJSON *get_rov_info()
 {
+    static char temp_str[20] = {0};
     cJSON *cjson_info = cJSON_CreateObject();
     cJSON_AddStringToObject(cjson_info, "Model", "CH32");
+    sprintf(temp_str, "%.02f", ms5837_temperature);
+    cJSON_AddStringToObject(cjson_info, "Temp", temp_str);
+    sprintf(temp_str, "%.02f", jy901.yaw);
+    cJSON_AddStringToObject(cjson_info, "Yaw", temp_str);
+    sprintf(temp_str, "%.02f", ms5837_depth);
+    cJSON_AddStringToObject(cjson_info, "Depth", temp_str);
     return cjson_info;
 }
 
