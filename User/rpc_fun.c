@@ -1,7 +1,7 @@
 /*
  * rpc_fun.c
  *
- *  Created on: 2024Äê6ÔÂ11ÈÕ
+ *  Created on: 2024ï¿½ï¿½6ï¿½ï¿½11ï¿½ï¿½
  *      Author: ssfxfss
  */
 
@@ -9,6 +9,8 @@
 #include "cJSON.h"
 #include "rpc_cjson.h"
 #include "sensor.h"
+#include "motor.h"
+#include "control.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,17 +19,17 @@ extern float ms5837_temperature;
 extern float ms5837_depth;
 
 /**
- * @brief »ñÈ¡ json ÄÚ¶ÔÓ¦Öµ
- * @param params cjson½á¹¹Ìå
- * @param str Öµ¶ÔÓ¦×Ö·û´®
- * @return »ñµÃµÄ¸¡µãÊý£¬ÈôÃ»ÓÐ»ñÈ¡µ½ÔòÎª 0
+ * @brief ï¿½ï¿½È¡ json ï¿½Ú¶ï¿½Ó¦Öµ
+ * @param params cjsonï¿½á¹¹ï¿½ï¿½
+ * @param str Öµï¿½ï¿½Ó¦ï¿½Ö·ï¿½ï¿½ï¿½
+ * @return ï¿½ï¿½ÃµÄ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ð»ï¿½È¡ï¿½ï¿½ï¿½ï¿½Îª 0
  */
 static double cjson_value_analysis_double(cJSON *params,const char *str)
 {
     cJSON* cjson_temp = NULL;
     double value;
     cjson_temp = cJSON_GetObjectItem(params, str);
-    if (cjson_temp != NULL)      //Èç¹ûÃ»ÊÕµ½Ôò·µ»Ø
+    if (cjson_temp != NULL)      //ï¿½ï¿½ï¿½Ã»ï¿½Õµï¿½ï¿½ò·µ»ï¿½
     {
         value = cjson_temp->valuedouble;
     }
@@ -40,7 +42,7 @@ static double cjson_value_analysis_double(cJSON *params,const char *str)
 static int rpc_manual_ctrl(double x, double y, double z, double r)
 {
     printf("manual ctrl cmd recv: x|%lf y|%lf z|%lf r|%lf\r\n", x, y, z, r);
-    // pwm write...
+    uvm_motor_write(&default_params, uvm_manual_ctrl(x, y, z, r));
     return 0;
 }
 
@@ -59,8 +61,8 @@ static cJSON *get_rov_info()
 }
 
 /**
- * @brief Á´½Óget_rov_infoº¯Êý
- * @param ctx ÏÂÎ»»úinfo->sensorµÄÖ¸Õë
+ * @brief ï¿½ï¿½ï¿½ï¿½get_rov_infoï¿½ï¿½ï¿½ï¿½
+ * @param ctx ï¿½ï¿½Î»ï¿½ï¿½info->sensorï¿½ï¿½Ö¸ï¿½ï¿½
  * @return Cjson object
  */
 cJSON *info_handler(jrpc_context *ctx, cJSON *params, cJSON *id)

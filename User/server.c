@@ -1,7 +1,7 @@
 /*
  * server.c
  *
- *  Created on: 2024Äê6ÔÂ10ÈÕ
+ *  Created on: 2024ï¿½ï¿½6ï¿½ï¿½10ï¿½ï¿½
  *      Author: ssfxfss
  */
 
@@ -11,6 +11,7 @@
 #include <string.h>
 #include "rpc_cjson.h"
 #include "rpc_fun.h"
+#include "application_pca9685.h"
 
 char TxBuffer1[BufSize];
 char RxBuffer1[BufSize];
@@ -65,7 +66,7 @@ void server_routine(size_t len)
         if(RxBuffer1[0] == 0x33)
         {
             printf("recv config\r\n");
-            // config_handle(RxBuffer1, TxBuffer1);
+            config_handle(RxBuffer1, TxBuffer1);
             return;
         }
         printf("no a http request.\r\n");
@@ -91,6 +92,5 @@ void server_routine(size_t len)
 
 void server_init(void)
 {
-    // pwm init...
     rpc_add_all_handler(&rpc);
 }

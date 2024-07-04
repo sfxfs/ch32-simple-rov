@@ -21,6 +21,8 @@
 #include "debug.h"
 #include "server.h"
 #include "sensor.h"
+#include "motor.h"
+#include "application_pca9685.h"
 #include "string.h"
 
 /* Global typedef */
@@ -142,6 +144,7 @@ int main(void)
 
     DMA_INIT();
     USARTx_CFG();
+    uvm_motor_init(&default_params);
     server_init();
 
     for(;;)
