@@ -10,9 +10,14 @@
 #include "rpc_cjson.h"
 #include "sensor.h"
 #include "motor.h"
+#include "pca9685.h"
+#include "application_pca9685.h"
 #include "control.h"
 #include <stdlib.h>
 #include <string.h>
+
+#define us2percent(us) (((us)*100.0)/20000.0) // 一个周期 20 ms
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt))) //限幅函数
 
 extern jy901_t jy901;
 extern float ms5837_temperature;
@@ -70,6 +75,30 @@ cJSON *info_handler(jrpc_context *ctx, cJSON *params, cJSON *id)
     return get_rov_info();
 }
 
+/**
+  * @brief  机械爪控制的rpc函数
+  * @param  *params json参数
+  * @param  *id  客户端标识
+  * @return  1：接收成功；0：接收失败
+  */
+cJSON *catcher(jrpc_context *ctx, cJSON *params, cJSON *id)
+{
+    uint8_t arm_catch;
+    static float cur = 1000.0f;
+    cur = constrain(cur,500,2500);
+
+    if (params == NULL) return cJSON_CreateNull();
+    arm_catch = params->child->valuedouble;
+    //pca9685 control -- 通道7 -- 机械臂
+    if (arm_catch > 0) pca9685_basic_write(7, 0.0f,constrain(us2percent(cur+=25),0,100));
+    else if (arm_catch < 0) pca9685_basic_write(7, 0.0f,constrain(us2percent(cur-=25),0,100));
+    else {
+        pca9685_basic_write(7, 0.0f,us2percent(cur));
+    }
+    //
+    return cJSON_CreateNull();
+}
+
 cJSON *empty_handler(jrpc_context *ctx, cJSON *params, cJSON *id)
 {
     return cJSON_CreateNull();
@@ -89,7 +118,7 @@ int rpc_add_all_handler(rpc_handle_t *handle)
 {
     int ret = 0;
     ret += rpc_add_method(handle, info_handler, "get_info", NULL);
-    ret += rpc_add_method(handle, empty_handler, "catch", NULL);
+    ret += rpc_add_method(handle, catcher, "catch", NULL);
     ret += rpc_add_method(handle, empty_handler, "light", NULL);
     ret += rpc_add_method(handle, empty_handler, "set_direction_locked", NULL);
     ret += rpc_add_method(handle, empty_handler, "set_depth_locked", NULL);

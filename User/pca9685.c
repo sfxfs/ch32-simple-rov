@@ -222,7 +222,7 @@ uint8_t pca9685_basic_init(pca9685_address_t addr, uint16_t hz)
         res = pca9685_init(&gs_handle);
         if (res != 0)
         {
-            pca9685_interface_debug_print("pca9685: init failed.\n");
+            printf("pca9685: init failed:%d\r\n",res);
 
             return 1;
         }

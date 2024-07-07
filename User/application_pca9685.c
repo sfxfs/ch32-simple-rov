@@ -66,6 +66,8 @@ propeller_params default_params = {
 };
 
 
+
+
 void config_handle(uint8_t *rxbuf, uint8_t *txbuf)
 {
     // ��һ���ֽ�ѡ�񲿷�
@@ -73,7 +75,17 @@ void config_handle(uint8_t *rxbuf, uint8_t *txbuf)
     // �ڶ����ֽ�ѡ�����
     uint8_t param = rxbuf[2];
     // �������ֽ�д�������
-    uint32_t *value = &rxbuf[3];//3456
+    union {
+            uint32_t value;
+            uint8_t bytes[4];
+        } data;
+        data.bytes[0] = rxbuf[6];
+        data.bytes[1] = rxbuf[5];
+        data.bytes[2] = rxbuf[4];
+        data.bytes[3] = rxbuf[3];
+
+    uint32_t value = data.value;////3456
+    printf("section:%d -- param:%d -- value:%d \r\n",section,param,value);
 
     // ����ṹ��ָ������
     propeller_attr *motors[] = {
@@ -83,36 +95,43 @@ void config_handle(uint8_t *rxbuf, uint8_t *txbuf)
     };
 
     if (section == 0) { // pwm_freq_offset
-        default_params.pwm_freq_offset = (int8_t)*value;
+        default_params.pwm_freq_offset = (int16_t)value;
+        sprintf(txbuf,"pwm_freq_offset has been chaged: %d\r\n",value);
     }
     else if (section >= 1 && section <= 6) {
         propeller_attr *motor = motors[section - 1];
 
         switch (param) {
             case 0:
-                motor->channel = (int16_t)*value;
+                motor->channel = (int16_t)value;
+                sprintf(txbuf,"channel has been chaged: %d\n",default_params.front_right.channel);
                 break;
             case 1:
-                motor->enabled = (bool)*value;
+                motor->enabled = (bool)value;
+                sprintf(txbuf,"enabled has been chaged: %d\n",motor->enabled);
                 break;
             case 2:
-                motor->reversed = (bool)*value;
+                motor->reversed = (bool)value;
+                sprintf(txbuf,"reversed has been chaged: %d\n",motor->reversed);
                 break;
             case 3:
-                motor->deadzone_upper = (int16_t)*value;
+                motor->deadzone_upper = (int16_t)value;
+                sprintf(txbuf,"deadzone_upper has been chaged: %d\n",motor->deadzone_upper);
                 break;
             case 4:
-                motor->deadzone_lower = (int16_t)*value;
+                motor->deadzone_lower = (int16_t)value;
+                sprintf(txbuf,"deadzone_lower has been chaged: %d\n",motor->deadzone_lower);
                 break;
             case 5:
-                motor->power_positive = (float)*value;
+                motor->power_positive = (float)value;
+                sprintf(txbuf,"power_positive has been chaged: %f\n",motor->power_positive);
                 break;
             case 6:
-                motor->power_negative = (float)*value;
+                motor->power_negative = (float)value;
+                sprintf(txbuf,"power_negative has been chaged: %f\n",motor->power_negative);
                 break;
         }
     }
-    *txbuf=*rxbuf;
 }
 
 // 限幅函数实现
