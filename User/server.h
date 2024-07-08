@@ -10,12 +10,11 @@
 
 #include "debug.h"
 
-#define BufSize    1024
+#define BufSize    2048
 
 extern char TxBuffer1[BufSize];
-extern char RxBuffer1[BufSize];
 
-void server_routine(size_t len);
+void server_routine(char *rx_buf, size_t len);
 void server_init(void);
 
 #endif /* USER_SERVER_H_ */

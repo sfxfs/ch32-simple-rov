@@ -1,6 +1,6 @@
-Mcu Type=CH32V20x
+Mcu Type=CH32V30x
+Target Path=obj\ch32-simple-rov.hex
 Address=0x08000000
-Target Path=obj/simple_rov.hex
 Erase All=true
 Program=true
 Verify=true
@@ -9,9 +9,9 @@ Reset=true
 Vendor=WCH
 Link=WCH-Link
 Toolchain=RISC-V
-Series=CH32V203
+Series=CH32V307
 RTOS=NoneOS
-MCU=CH32V203C8T6
-Description=Website: http://www.wch.cn/products/CH32V203.html?\nROM(byte): 64K, SRAM(byte): 20K, CHIP PINS: 48, GPIO PORTS: 37.\nWCH CH32V2 series of mainstream MCUs covers the needs of a large variety of applications in the industrial,medical and consumer markets. High performance with first-class peripherals and low-power,low-voltage operation is paired with a high level of integration at accessible prices with a simple architecture and easy-to-use tools.
+MCU=CH32V307VCT6
+Description=Website: http://www.wch.cn/products/CH32V307.html?\nROM(byte): 288K, SRAM(byte): 32K, CHIP PINS: 100, GPIO PORTS: 80.\nWCH CH32V3 series of mainstream MCUs covers the needs of a large variety of applications in the industrial,medical and consumer markets. High performance with first-class peripherals and low-power,low-voltage operation is paired with a high level of integration at accessible prices with a simple architecture and easy-to-use tools.
 
-PeripheralVersion=2.1
+PeripheralVersion=2.5

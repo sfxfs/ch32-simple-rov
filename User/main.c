@@ -2,190 +2,300 @@
  * File Name          : main.c
  * Author             : WCH
  * Version            : V1.0.0
- * Date               : 2021/06/06
+ * Date               : 2022/05/31
  * Description        : Main program body.
- *********************************************************************************
- * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
- * Attention: This software (modified or not) and binary are used for 
- * microcontroller manufactured by Nanjing Qinheng Microelectronics.
- *******************************************************************************/
-
+*********************************************************************************
+* Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
+* Attention: This software (modified or not) and binary are used for 
+* microcontroller manufactured by Nanjing Qinheng Microelectronics.
+*******************************************************************************/
 /*
  *@Note
- *USART Print debugging routine:
- *USART1_Tx(PA9).
- *This example demonstrates using USART1(PA9) as a print debug port output.
- *
+TCP Server example, demonstrating that TCP Server
+receives data and sends back after connecting to a client.
+For details on the selection of engineering chips,
+please refer to the "CH32V30x Evaluation Board Manual" under the CH32V307EVT\EVT\PUB folder.
  */
-
-#include "debug.h"
-#include "server.h"
-#include "sensor.h"
-#include "motor.h"
-#include "application_pca9685.h"
 #include "string.h"
+#include "eth_driver.h"
 
-/* Global typedef */
+#include "server.h"
 
-/* Global define */
+#define KEEPALIVE_ENABLE                1               //Enable keep alive function
 
-/* Global Variable */
+u8 MACAddr[6];                                          //MAC address
+u8 IPAddr[4] = {192, 168, 137, 219};                       //IP address
+u8 GWIPAddr[4] = {192, 168, 137, 1};                      //Gateway IP address
+u8 IPMask[4] = {255, 255, 255, 0};                      //subnet mask
+u16 srcport = 8888;                                     //source port
 
-void USART3_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-void UART4_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+u8 SocketIdForListen;                                   //Socket for Listening
+u8 socket[WCHNET_MAX_SOCKET_NUM];                       //Save the currently connected socket
+u8 SocketRecvBuf[WCHNET_MAX_SOCKET_NUM][RECE_BUF_LEN];  //socket receive buffer
+u8 MyBuf[RECE_BUF_LEN];
 
-void DMA_INIT(void)
+/*********************************************************************
+ * @fn      mStopIfError
+ *
+ * @brief   check if error.
+ *
+ * @param   iError - error constants.
+ *
+ * @return  none
+ */
+void mStopIfError(u8 iError)
 {
-    DMA_InitTypeDef DMA_InitStructure = {0};
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-
-    DMA_DeInit(DMA1_Channel7);
-    DMA_InitStructure.DMA_PeripheralBaseAddr = (u32)(&USART2->DATAR); /* USART2->DATAR:0x40004404 */
-    DMA_InitStructure.DMA_MemoryBaseAddr = (u32)TxBuffer1;
-    DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-    DMA_InitStructure.DMA_BufferSize = BufSize;
-    DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-    DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-    DMA_InitStructure.DMA_Priority = DMA_Priority_VeryHigh;
-    DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
-    DMA_Init(DMA1_Channel7, &DMA_InitStructure);
-
-    DMA_DeInit(DMA1_Channel6);
-    DMA_InitStructure.DMA_PeripheralBaseAddr = (u32)(&USART2->DATAR);
-    DMA_InitStructure.DMA_MemoryBaseAddr = (u32)RxBuffer1;
-    DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-    DMA_InitStructure.DMA_BufferSize = BufSize;
-    DMA_Init(DMA1_Channel6, &DMA_InitStructure);
+    if (iError == WCHNET_ERR_SUCCESS)
+        return;
+    printf("Error: %02X\r\n", (u16) iError);
 }
 
-void USARTx_CFG(void)
+/*********************************************************************
+ * @fn      TIM2_Init
+ *
+ * @brief   Initializes TIM2.
+ *
+ * @return  none
+ */
+void TIM2_Init(void)
 {
-    GPIO_InitTypeDef  GPIO_InitStructure = {0};
-    USART_InitTypeDef USART_InitStructure = {0};
-    NVIC_InitTypeDef  NVIC_InitStructure = {0};
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = { 0 };
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2 | RCC_APB1Periph_USART3 | RCC_APB1Periph_UART4, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
-    /* USART2 TX-->A.2   RX-->A.3 */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-    /* USART3 TX-->B.10  RX-->B.11 */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-    /* USART4 TX-->B.0  RX-->B.1 */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    TIM_TimeBaseStructure.TIM_Period = SystemCoreClock / 1000000;
+    TIM_TimeBaseStructure.TIM_Prescaler = WCHNETTIMERPERIOD * 1000 - 1;
+    TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
 
-    USART_InitStructure.USART_BaudRate = 115200;
-    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    USART_InitStructure.USART_StopBits = USART_StopBits_1;
-    USART_InitStructure.USART_Parity = USART_Parity_No;
-    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
+    TIM_Cmd(TIM2, ENABLE);
+    TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+    NVIC_EnableIRQ(TIM2_IRQn);
+}
 
-    USART_Init(USART2, &USART_InitStructure);
-    USART_Init(USART3, &USART_InitStructure);
-    USART_Init(UART4, &USART_InitStructure);
+/*********************************************************************
+ * @fn      WCHNET_CreateTcpSocketListen
+ *
+ * @brief   Create TCP Socket for Listening
+ *
+ * @return  none
+ */
+void WCHNET_CreateTcpSocketListen(void)
+{
+    u8 i;
+    SOCK_INF TmpSocketInf;
 
-    DMA_Cmd(DMA1_Channel6, ENABLE); /* USART2 Rx */
-    USART_DMACmd(USART2, USART_DMAReq_Tx | USART_DMAReq_Rx, ENABLE);
+    memset((void *) &TmpSocketInf, 0, sizeof(SOCK_INF));
+    TmpSocketInf.SourPort = srcport;
+    TmpSocketInf.ProtoType = PROTO_TYPE_TCP;
+    i = WCHNET_SocketCreat(&SocketIdForListen, &TmpSocketInf);
+    printf("SocketIdForListen %d\r\n", SocketIdForListen);
+    mStopIfError(i);
+    i = WCHNET_SocketListen(SocketIdForListen);                   //listen for connections
+    mStopIfError(i);
+}
 
-    USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-    NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
+/*********************************************************************
+ * @fn      WCHNET_DataLoopback
+ *
+ * @brief   Data loopback function.
+ *
+ * @param   id - socket id.
+ *
+ * @return  none
+ */
+void WCHNET_DataLoopback(u8 id)
+{
+#if 1
+    u8 i;
+    u32 len;
+    u32 endAddr = SocketInf[id].RecvStartPoint + SocketInf[id].RecvBufLen;       //Receive buffer end address
 
-    USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
-    NVIC_InitStructure.NVIC_IRQChannel = UART4_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
+    if ((SocketInf[id].RecvReadPoint + SocketInf[id].RecvRemLen) > endAddr) {    //Calculate the length of the received data
+        len = endAddr - SocketInf[id].RecvReadPoint;
+    }
+    else {
+        len = SocketInf[id].RecvRemLen;
+    }
 
-    USART_Cmd(USART2, ENABLE);
-    USART_Cmd(USART3, ENABLE);
-    USART_Cmd(UART4, ENABLE);
+    server_routine((char *)SocketInf[id].RecvReadPoint, len);
+    u32 l = strlen(TxBuffer1);
+    i = WCHNET_SocketSend(id, (uint8_t *)TxBuffer1, &l);        //send data
+
+    if (i == WCHNET_ERR_SUCCESS) {
+        WCHNET_SocketRecv(id, NULL, &len);                                      //Clear sent data
+    }
+#else
+    u32 len, totallen;
+    u8 *p = MyBuf, TransCnt = 255;
+
+    len = WCHNET_SocketRecvLen(id, NULL);                                //query length
+    printf("Receive Len = %d\r\n", len);
+    totallen = len;
+    WCHNET_SocketRecv(id, MyBuf, &len);                                  //Read the data of the receive buffer into MyBuf
+    while(1){
+        len = totallen;
+        WCHNET_SocketSend(id, p, &len);                                  //Send the data
+        totallen -= len;                                                 //Subtract the sent length from the total length
+        p += len;                                                        //offset buffer pointer
+        if( !--TransCnt )  break;                                        //Timeout exit
+        if(totallen) continue;                                           //If the data is not sent, continue to send
+        break;                                                           //After sending, exit
+    }
+#endif
+}
+
+/*********************************************************************
+ * @fn      WCHNET_HandleSockInt
+ *
+ * @brief   Socket Interrupt Handle
+ *
+ * @param   socketid - socket id.
+ *          intstat - interrupt status
+ *
+ * @return  none
+ */
+void WCHNET_HandleSockInt(u8 socketid, u8 intstat)
+{
+    u8 i;
+
+    if (intstat & SINT_STAT_RECV)                                 //receive data
+    {
+        WCHNET_DataLoopback(socketid);                            //Data loopback
+    }
+    if (intstat & SINT_STAT_CONNECT)                              //connect successfully
+    {
+#if KEEPALIVE_ENABLE
+        WCHNET_SocketSetKeepLive(socketid, ENABLE);
+#endif
+        WCHNET_ModifyRecvBuf(socketid, (u32) SocketRecvBuf[socketid],
+        RECE_BUF_LEN);
+        for (i = 0; i < WCHNET_MAX_SOCKET_NUM; i++) {
+            if (socket[i] == 0xff) {                              //save connected socket id
+                socket[i] = socketid;
+                break;
+            }
+        }
+        printf("TCP Connect Success\r\n");
+        printf("socket id: %d\r\n",socket[i]);
+    }
+    if (intstat & SINT_STAT_DISCONNECT)                           //disconnect
+    {
+        for (i = 0; i < WCHNET_MAX_SOCKET_NUM; i++) {             //delete disconnected socket id
+            if (socket[i] == socketid) {
+                socket[i] = 0xff;
+                break;
+            }
+        }
+        printf("TCP Disconnect\r\n");
+    }
+    if (intstat & SINT_STAT_TIM_OUT)                              //timeout disconnect
+    {
+        for (i = 0; i < WCHNET_MAX_SOCKET_NUM; i++) {             //delete disconnected socket id
+            if (socket[i] == socketid) {
+                socket[i] = 0xff;
+                break;
+            }
+        }
+        printf("TCP Timeout\r\n");
+    }
+}
+
+/*********************************************************************
+ * @fn      WCHNET_HandleGlobalInt
+ *
+ * @brief   Global Interrupt Handle
+ *
+ * @return  none
+ */
+void WCHNET_HandleGlobalInt(void)
+{
+    u8 intstat;
+    u16 i;
+    u8 socketint;
+
+    intstat = WCHNET_GetGlobalInt();                              //get global interrupt flag
+    if (intstat & GINT_STAT_UNREACH)                              //Unreachable interrupt
+    {
+        printf("GINT_STAT_UNREACH\r\n");
+    }
+    if (intstat & GINT_STAT_IP_CONFLI)                            //IP conflict
+    {
+        printf("GINT_STAT_IP_CONFLI\r\n");
+    }
+    if (intstat & GINT_STAT_PHY_CHANGE)                           //PHY status change
+    {
+        i = WCHNET_GetPHYStatus();
+        if (i & PHY_Linked_Status)
+            printf("PHY Link Success\r\n");
+    }
+    if (intstat & GINT_STAT_SOCKET) {                             //socket related interrupt
+        for (i = 0; i < WCHNET_MAX_SOCKET_NUM; i++) {
+            socketint = WCHNET_GetSocketInt(i);
+            if (socketint)
+                WCHNET_HandleSockInt(i, socketint);
+        }
+    }
 }
 
 /*********************************************************************
  * @fn      main
  *
- * @brief   Main program.
+ * @brief   Main program
  *
  * @return  none
  */
 int main(void)
 {
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+    u8 i;
     SystemCoreClockUpdate();
     Delay_Init();
-    USART_Printf_Init(115200);
+    USART_Printf_Init(115200);                                    //USART initialize
+    printf("TCPServer Test\r\n");
+    printf("SystemClk:%d\r\n", SystemCoreClock);
+    printf("ChipID:%08x\r\n", DBGMCU_GetCHIPID());
+    printf("net version:%x\n", WCHNET_GetVer());
+    if (WCHNET_LIB_VER != WCHNET_GetVer()) {
+        printf("version error.\n");
+    }
+    WCHNET_GetMacAddr(MACAddr);                                   //get the chip MAC address
+    printf("mac addr:");
+    for(i = 0; i < 6; i++) 
+        printf("%x ",MACAddr[i]);
+    printf("\n");
+    TIM2_Init();
+    i = ETH_LibInit(IPAddr, GWIPAddr, IPMask, MACAddr);           //Ethernet library initialize
+    mStopIfError(i);
+    if (i == WCHNET_ERR_SUCCESS)
+        printf("WCHNET_LibInit Success\r\n");
+#if KEEPALIVE_ENABLE                                               //Configure keep alive parameters
+    {
+        struct _KEEP_CFG cfg;
 
-    DMA_INIT();
-    USARTx_CFG();
-    uvm_motor_init(&default_params);
+        cfg.KLIdle = 20000;
+        cfg.KLIntvl = 15000;
+        cfg.KLCount = 9;
+        WCHNET_ConfigKeepLive(&cfg);
+    }
+#endif
+    memset(socket, 0xff, WCHNET_MAX_SOCKET_NUM);
+    WCHNET_CreateTcpSocketListen();                               //Create TCP Socket for Listening
+
     server_init();
 
-    for(;;)
+    while(1)
     {
-        if(USART_GetFlagStatus(USART2, USART_FLAG_IDLE) == SET)
+        /*Ethernet library main task function,
+         * which needs to be called cyclically*/
+        WCHNET_MainTask();
+        /*Query the Ethernet global interrupt,
+         * if there is an interrupt, call the global interrupt handler*/
+        if(WCHNET_QueryGlobalInt())
         {
-            int recv_count = BufSize - DMA_GetCurrDataCounter(DMA1_Channel6);
-            printf("recv bytes:%d\r\n\r\n", recv_count);
-            printf("%.*s\r\n\r\n", recv_count, RxBuffer1);
-            DMA_Cmd(DMA1_Channel6, DISABLE);
-            // ------------------------------------------
-
-            server_routine(recv_count);
-
-            // ------------------------------------------
-            DMA_SetCurrDataCounter(DMA1_Channel7, strlen(TxBuffer1));
-            DMA1_Channel7->MADDR = (uint32_t)TxBuffer1;
-            DMA_Cmd(DMA1_Channel7, ENABLE);
-            while(DMA_GetFlagStatus(DMA1_FLAG_TC7) == RESET); /* Wait until USART2 TX DMA1 Transfer Complete */
-
-            memset(RxBuffer1, 0, recv_count);
-            DMA1_Channel6->MADDR = (uint32_t)RxBuffer1; // ptr to head
-            DMA_SetCurrDataCounter(DMA1_Channel6, BufSize); //count set to 0
-            USART_ReceiveData(USART2); // clear idle flag
-            DMA_Cmd(DMA1_Channel6, ENABLE);
+            WCHNET_HandleGlobalInt();
         }
     }
 }
 
-void USART3_IRQHandler(void) // Depth sensor
-{
-    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
-    {
-        jy901_cope_data(USART_ReceiveData(USART3));
-    }
-}
-
-void UART4_IRQHandler(void)
-{
-    if(USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
-    {
-        depth_sensor_cope_data(USART_ReceiveData(UART4));
-    }
-}

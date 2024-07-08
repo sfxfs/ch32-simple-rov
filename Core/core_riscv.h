@@ -1,9 +1,9 @@
 /********************************** (C) COPYRIGHT  *******************************
- * File Name          : core_riscv.h
- * Author             : WCH
- * Version            : V1.0.1
- * Date               : 2023/11/11
- * Description        : RISC-V V4 Core Peripheral Access Layer Header File for CH32V20x
+* File Name          : core_riscv.h
+* Author             : WCH
+* Version            : V1.0.1
+* Date               : 2024/03/06
+* Description        : RISC-V V4 Core Peripheral Access Layer Header File for CH32V30x
 *********************************************************************************
 * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
 * Attention: This software (modified or not) and binary are used for 
@@ -13,38 +13,38 @@
 #define __CORE_RISCV_H__
 
 #ifdef __cplusplus
-extern "C" {
+ extern "C" {
 #endif
 
 /* IO definitions */
 #ifdef __cplusplus
-  #define     __I     volatile                /*  defines 'read only' permissions      */
+  #define     __I     volatile                /* defines 'read only' permissions    */
 #else
-  #define     __I     volatile const          /*  defines 'read only' permissions     */
+  #define     __I     volatile const          /* defines 'read only' permissions    */
 #endif
-#define       __O     volatile                /*  defines 'write only' permissions     */
-#define       __IO    volatile                /*  defines 'read / write' permissions   */
+#define       __O     volatile                /* defines 'write only' permissions   */
+#define       __IO    volatile                /* defines 'read / write' permissions */
 
 /* Standard Peripheral Library old types (maintained for legacy purpose) */
-typedef __I uint64_t vuc64;   /* Read Only */
-typedef __I uint32_t vuc32;   /* Read Only */
-typedef __I uint16_t vuc16;   /* Read Only */
-typedef __I uint8_t  vuc8;    /* Read Only */
+typedef __I uint64_t vuc64;  /* Read Only */
+typedef __I uint32_t vuc32;  /* Read Only */
+typedef __I uint16_t vuc16;  /* Read Only */
+typedef __I uint8_t  vuc8;   /* Read Only */
 
 typedef const uint64_t uc64;  /* Read Only */
 typedef const uint32_t uc32;  /* Read Only */
 typedef const uint16_t uc16;  /* Read Only */
 typedef const uint8_t  uc8;   /* Read Only */
 
-typedef __I int64_t vsc64;    /* Read Only */
-typedef __I int32_t vsc32;    /* Read Only */
-typedef __I int16_t vsc16;    /* Read Only */
-typedef __I int8_t  vsc8;     /* Read Only */
+typedef __I int64_t vsc64;  /* Read Only */
+typedef __I int32_t vsc32;  /* Read Only */
+typedef __I int16_t vsc16;  /* Read Only */
+typedef __I int8_t  vsc8;   /* Read Only */
 
-typedef const int64_t sc64;   /* Read Only */
-typedef const int32_t sc32;   /* Read Only */
-typedef const int16_t sc16;   /* Read Only */
-typedef const int8_t  sc8;    /* Read Only */
+typedef const int64_t sc64;  /* Read Only */
+typedef const int32_t sc32;  /* Read Only */
+typedef const int16_t sc16;  /* Read Only */
+typedef const int8_t  sc8;   /* Read Only */
 
 typedef __IO uint64_t  vu64;
 typedef __IO uint32_t  vu32;
@@ -119,7 +119,6 @@ typedef struct
 
 #define SysTick         ((SysTick_Type *) 0xE000F000)
 
-
 /*********************************************************************
  * @fn      __enable_irq
  *
@@ -191,8 +190,8 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE void NVIC_DisableIRQ(IRQn_Ty
  *
  * @param   IRQn - Interrupt Numbers
  *
- * @return  1 - Interrupt Pending Enable
- *          0 - Interrupt Pending Disable
+ * @return  1 - Interrupt Enable
+ *          0 - Interrupt Disable
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE uint32_t NVIC_GetStatusIRQ(IRQn_Type IRQn)
 {
@@ -263,7 +262,14 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE uint32_t NVIC_GetActive(IRQn
  * @brief   Set Interrupt Priority
  *
  * @param   IRQn - Interrupt Numbers
- *          interrupt nesting enable(CSR-0x804 bit1 = 1)
+ *          interrupt nesting enable-8 Level(CSR-0x804 bit1 = 1 bit[3:2] = 3)
+ *            priority - bit[7:5] - Preemption Priority
+ *                       bit[4:0] - Reserve
+ *          interrupt nesting enable-4 Level(CSR-0x804 bit1 = 1 bit[3:2] = 2)
+ *            priority - bit[7:6] - Preemption Priority
+ *                       bit[5] - Sub priority
+ *                       bit[4:0] - Reserve
+ *          interrupt nesting enable-2 Level(CSR-0x804 bit1 = 1 bit[3:2] = 1)
  *            priority - bit[7] - Preemption Priority
  *                       bit[6:5] - Sub priority
  *                       bit[4:0] - Reserve
@@ -300,7 +306,11 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE void __WFI(void)
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE void _SEV(void)
 {
-  NVIC->SCTLR |= (1<<5);
+  uint32_t t;
+
+  t = NVIC->SCTLR;
+  NVIC->SCTLR |= (1<<3)|(1<<5);
+  NVIC->SCTLR = (NVIC->SCTLR & ~(1<<5)) | ( t & (1<<5));
 }
 
 /*********************************************************************
@@ -312,11 +322,8 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE void _SEV(void)
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE void _WFE(void)
 {
-    uint32_t tmp= NVIC->SCTLR;
-    tmp &= ~(1<<5);
-    tmp |= (1<<3);
-    NVIC->SCTLR = tmp;
-    asm volatile ("wfi");
+  NVIC->SCTLR |= (1<<3);
+  asm volatile ("wfi");
 }
 
 /*********************************************************************
@@ -331,10 +338,6 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE void __WFE(void)
   _SEV();
   _WFE();
   _WFE();
-  if(*(vu32*)(0x40023800) & (1<<6))
-  {
-    NVIC->SCTLR |= (1<<5);
-  }
 }
 
 /*********************************************************************
@@ -342,8 +345,8 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE void __WFE(void)
  *
  * @brief   Set VTF Interrupt
  *
- * @param   addr - VTF interrupt service function base address.
- *          IRQn - Interrupt Numbers
+ * @param   add - VTF interrupt service function base address.
+ *          IRQn -Interrupt Numbers
  *          num - VTF Interrupt Numbers
  *          NewState - DISABLE or ENABLE
  *
@@ -398,15 +401,15 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOADD_W(volatile 
 }
 
 /*********************************************************************
- * @fn      __AMOAND_W
+ * @fn     __AMOAND_W
  *
- * @brief   Atomic And with 32bit value
- *          Atomically AND 32bit value with value in memory using amoand.d.
+ * @brief  Atomic And with 32bit value
+ *         Atomically AND 32bit value with value in memory using amoand.d.
  *
- * @param   addr - Address pointer to data, address need to be 4byte aligned
- *          value - value to be ANDed
+ * @param  addr - Address pointer to data, address need to be 4byte aligned
+ *         value - value to be ANDed
  *
- * @return  return memory value & and value
+ * @return return memory value & and value
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOAND_W(volatile int32_t *addr, int32_t value)
 {
@@ -422,11 +425,10 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOAND_W(volatile 
  *
  * @brief   Atomic signed MAX with 32bit value
  *          Atomically signed max compare 32bit value with value in memory using amomax.d.
- *
  * @param   addr - Address pointer to data, address need to be 4byte aligned
  *          value - value to be compared
  *
- * @return  the bigger value
+ * @return  return the bigger value
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOMAX_W(volatile int32_t *addr, int32_t value)
 {
@@ -438,15 +440,15 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOMAX_W(volatile 
 }
 
 /*********************************************************************
- * @fn      __AMOMAXU_W
+ * @fn     __AMOMAXU_W
  *
- * @brief   Atomic unsigned MAX with 32bit value
- *          Atomically unsigned max compare 32bit value with value in memory using amomaxu.d.
+ * @brief  Atomic unsigned MAX with 32bit value
+ *         Atomically unsigned max compare 32bit value with value in memory using amomaxu.d.
  *
- * @param   addr - Address pointer to data, address need to be 4byte aligned
- *          value - value to be compared
+ * @param  addr - Address pointer to data, address need to be 4byte aligned
+ *         value - value to be compared
  *             
- * @return  return the bigger value
+ * @return return the bigger value
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE uint32_t __AMOMAXU_W(volatile uint32_t *addr, uint32_t value)
 {
@@ -458,15 +460,15 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE uint32_t __AMOMAXU_W(volatil
 }
 
 /*********************************************************************
- * @fn      __AMOMIN_W
+ * @fn     __AMOMIN_W
  *
- * @brief   Atomic signed MIN with 32bit value
- *          Atomically signed min compare 32bit value with value in memory using amomin.d.
+ * @brief  Atomic signed MIN with 32bit value
+ *         Atomically signed min compare 32bit value with value in memory using amomin.d.
  *
- * @param   addr - Address pointer to data, address need to be 4byte aligned
- *          value - value to be compared
+ * @param  addr - Address pointer to data, address need to be 4byte aligned
+ *         value - value to be compared
  *
- * @return  the smaller value
+ * @return return the smaller value
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOMIN_W(volatile int32_t *addr, int32_t value)
 {
@@ -486,7 +488,7 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOMIN_W(volatile 
  * @param   addr - Address pointer to data, address need to be 4byte aligned
  *          value - value to be compared
  *
- * @return  the smaller value
+ * @return  return the smaller value
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE uint32_t __AMOMINU_W(volatile uint32_t *addr, uint32_t value)
 {
@@ -498,15 +500,15 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE uint32_t __AMOMINU_W(volatil
 }
 
 /*********************************************************************
- * @fn      __AMOOR_W
+ * @fn       __AMOOR_W
  *  
- * @brief   Atomic OR with 32bit value
- *          Atomically OR 32bit value with value in memory using amoor.d.
+ * @brief    Atomic OR with 32bit value
+ *           Atomically OR 32bit value with value in memory using amoor.d.
  *
- * @param   addr - Address pointer to data, address need to be 4byte aligned
- *          value - value to be ORed
+ * @param    addr - Address pointer to data, address need to be 4byte aligned
+ *           value - value to be ORed
  * 
- * @return  return memory value | and value
+ * @return   return memory value | and value
  */
 __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOOR_W(volatile int32_t *addr, int32_t value)
 {
@@ -537,7 +539,7 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE uint32_t __AMOSWAP_W(volatil
 }
 
 /*********************************************************************
- * @fn      __AMOXOR_W
+ * @fn      __AMOXOR_W     
  *
  * @brief   Atomic XOR with 32bit value
  *          Atomically XOR 32bit value with value in memory using amoxor.d.
@@ -557,6 +559,12 @@ __attribute__( ( always_inline ) ) RV_STATIC_INLINE int32_t __AMOXOR_W(volatile 
 }
 
 /* Core_Exported_Functions */  
+extern uint32_t __get_FFLAGS(void);
+extern void __set_FFLAGS(uint32_t value);
+extern uint32_t __get_FRM(void);
+extern void __set_FRM(uint32_t value);
+extern uint32_t __get_FCSR(void);
+extern void __set_FCSR(uint32_t value);
 extern uint32_t __get_MSTATUS(void);
 extern void __set_MSTATUS(uint32_t value);
 extern uint32_t __get_MISA(void);

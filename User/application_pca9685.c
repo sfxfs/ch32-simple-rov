@@ -10,7 +10,7 @@
 propeller_params default_params = {
     .pwm_freq_offset = -2,
     .front_right = {
-        .channel = 0,
+        .channel = 7,
         .enabled = true,
         .reversed = false,
         .deadzone_upper = 25,
@@ -19,7 +19,7 @@ propeller_params default_params = {
         .power_negative = 0.5,
     },
     .front_left = {
-        .channel = 1,
+        .channel = 4,
         .enabled = true,
         .reversed = false,
         .deadzone_upper = 25,
@@ -28,7 +28,7 @@ propeller_params default_params = {
         .power_negative = 0.5,
     },
     .center_right = {
-        .channel = 2,
+        .channel = 6,
         .enabled = true,
         .reversed = false,
         .deadzone_upper = 25,
@@ -46,7 +46,7 @@ propeller_params default_params = {
         .power_negative = 0.5,
     },
     .back_right = {
-        .channel = 4,
+        .channel = 5,
         .enabled = true,
         .reversed = false,
         .deadzone_upper = 25,
@@ -55,7 +55,7 @@ propeller_params default_params = {
         .power_negative = 0.5,
     },
     .back_left = {
-        .channel = 5,
+        .channel = 2,
         .enabled = true,
         .reversed = false,
         .deadzone_upper = 25,

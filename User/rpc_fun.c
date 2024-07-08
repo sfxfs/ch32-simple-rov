@@ -8,7 +8,7 @@
 #include "debug.h"
 #include "cJSON.h"
 #include "rpc_cjson.h"
-#include "sensor.h"
+//#include "sensor.h"
 #include "motor.h"
 #include "pca9685.h"
 #include "application_pca9685.h"
@@ -19,9 +19,9 @@
 #define us2percent(us) (((us)*100.0)/20000.0) // 一个周期 20 ms
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt))) //限幅函数
 
-extern jy901_t jy901;
-extern float ms5837_temperature;
-extern float ms5837_depth;
+//extern jy901_t jy901;
+//extern float ms5837_temperature;
+//extern float ms5837_depth;
 
 /**
  * @brief ��ȡ json �ڶ�Ӧֵ
@@ -53,15 +53,15 @@ static int rpc_manual_ctrl(double x, double y, double z, double r)
 
 static cJSON *get_rov_info()
 {
-    static char temp_str[20] = {0};
+//    static char temp_str[20] = {0};
     cJSON *cjson_info = cJSON_CreateObject();
     cJSON_AddStringToObject(cjson_info, "Model", "CH32");
-    sprintf(temp_str, "%.02f", ms5837_temperature);
-    cJSON_AddStringToObject(cjson_info, "Temp", temp_str);
-    sprintf(temp_str, "%.02f", jy901.yaw);
-    cJSON_AddStringToObject(cjson_info, "Yaw", temp_str);
-    sprintf(temp_str, "%.02f", ms5837_depth);
-    cJSON_AddStringToObject(cjson_info, "Depth", temp_str);
+//    sprintf(temp_str, "%.02f", ms5837_temperature);
+//    cJSON_AddStringToObject(cjson_info, "Temp", temp_str);
+//    sprintf(temp_str, "%.02f", jy901.yaw);
+//    cJSON_AddStringToObject(cjson_info, "Yaw", temp_str);
+//    sprintf(temp_str, "%.02f", ms5837_depth);
+//    cJSON_AddStringToObject(cjson_info, "Depth", temp_str);
     return cjson_info;
 }
 
@@ -83,17 +83,17 @@ cJSON *info_handler(jrpc_context *ctx, cJSON *params, cJSON *id)
   */
 cJSON *catcher(jrpc_context *ctx, cJSON *params, cJSON *id)
 {
-    uint8_t arm_catch;
+    int arm_catch;
     static float cur = 1000.0f;
     cur = constrain(cur,500,2500);
 
     if (params == NULL) return cJSON_CreateNull();
     arm_catch = params->child->valuedouble;
-    //pca9685 control -- 通道7 -- 机械臂
-    if (arm_catch > 0) pca9685_basic_write(7, 0.0f,constrain(us2percent(cur+=25),0,100));
-    else if (arm_catch < 0) pca9685_basic_write(7, 0.0f,constrain(us2percent(cur-=25),0,100));
+    //pca9685 control -- 通道1 -- 机械臂
+    if (arm_catch > 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur+=25),0,100));
+    else if (arm_catch < 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur-=25),0,100));
     else {
-        pca9685_basic_write(7, 0.0f,us2percent(cur));
+        pca9685_basic_write(1, 0.0f,us2percent(cur));
     }
     //
     return cJSON_CreateNull();

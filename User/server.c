@@ -9,12 +9,14 @@
 
 #include <stdlib.h>
 #include <string.h>
+
+#include "eth_driver.h"
 #include "rpc_cjson.h"
 #include "rpc_fun.h"
+#include "motor.h"
 #include "application_pca9685.h"
 
 char TxBuffer1[BufSize];
-char RxBuffer1[BufSize];
 
 rpc_handle_t rpc;
 
@@ -55,18 +57,18 @@ static char *uvm_strstr(const char *p1, int len, const char *p2)
 
 #define HTTP_HEADER_BUF_SIZE 128
 
-void server_routine(size_t len)
+void server_routine(char *rx_buf, size_t len)
 {
-    char *body = uvm_strstr(RxBuffer1, len, "\r\n\r\n");
+    char *body = uvm_strstr(rx_buf, len, "\r\n\r\n");
     if (body != NULL) {
         body += 4;    // "\r\n\r\n"
-        len = len - (RxBuffer1 - body);
+        len = len - (rx_buf - body);
     } else
     {
-        if(RxBuffer1[0] == 0x33)
+        if(rx_buf[0] == 0x33)
         {
             printf("recv config\r\n");
-            config_handle(RxBuffer1, TxBuffer1);
+//            config_handle(rx_buf, TxBuffer1);
             return;
         }
         printf("no a http request.\r\n");
@@ -92,5 +94,6 @@ void server_routine(size_t len)
 
 void server_init(void)
 {
+    uvm_motor_init(&default_params);
     rpc_add_all_handler(&rpc);
 }

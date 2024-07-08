@@ -1,15 +1,15 @@
 /********************************** (C) COPYRIGHT  *******************************
- * File Name          : debug.c
- * Author             : WCH
- * Version            : V1.0.0
- * Date               : 2021/06/06
- * Description        : This file contains all the functions prototypes for UART
- *                      Printf , Delay functions.
- *********************************************************************************
- * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
- * Attention: This software (modified or not) and binary are used for 
- * microcontroller manufactured by Nanjing Qinheng Microelectronics.
- *******************************************************************************/
+* File Name          : debug.c
+* Author             : WCH
+* Version            : V1.0.0
+* Date               : 2021/06/06
+* Description        : This file contains all the functions prototypes for UART
+*                      Printf , Delay functions.
+*********************************************************************************
+* Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
+* Attention: This software (modified or not) and binary are used for 
+* microcontroller manufactured by Nanjing Qinheng Microelectronics.
+*******************************************************************************/
 #include "debug.h"
 
 static uint8_t  p_us = 0;
@@ -51,7 +51,8 @@ void Delay_Us(uint32_t n)
     SysTick->CTLR |= (1 << 4);
     SysTick->CTLR |= (1 << 5) | (1 << 0);
 
-    while((SysTick->SR & (1 << 0)) != (1 << 0));
+    while((SysTick->SR & (1 << 0)) != (1 << 0))
+        ;
     SysTick->CTLR &= ~(1 << 0);
 }
 
@@ -75,7 +76,8 @@ void Delay_Ms(uint32_t n)
     SysTick->CTLR |= (1 << 4);
     SysTick->CTLR |= (1 << 5) | (1 << 0);
 
-    while((SysTick->SR & (1 << 0)) != (1 << 0));
+    while((SysTick->SR & (1 << 0)) != (1 << 0))
+        ;
     SysTick->CTLR &= ~(1 << 0);
 }
 
@@ -169,8 +171,7 @@ void SDI_Printf_Enable(void)
  *
  * @return  size: Data length
  */
-__attribute__((used))
-int _write(int fd, char *buf, int size)
+__attribute__((used)) int _write(int fd, char *buf, int size)
 {
     int i = 0;
 
@@ -181,8 +182,9 @@ int _write(int fd, char *buf, int size)
     {
 
         /**
-         * data0  data1 8 byte
-         * data0 The storage length of the lowest byte, with a maximum of 7 bytes.
+         * data0  data1 8 bytes
+         * data0 The lowest byte storage length, the maximum is 7
+         *
          */
 
         while( (*(DEBUG_DATA0_ADDRESS) != 0u))
@@ -210,7 +212,8 @@ int _write(int fd, char *buf, int size)
 
 
 #else
-    for(i = 0; i < size; i++){
+    for(i = 0; i < size; i++)
+    {
 #if(DEBUG == DEBUG_UART1)
         while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
         USART_SendData(USART1, *buf++);
@@ -233,8 +236,7 @@ int _write(int fd, char *buf, int size)
  *
  * @return  size: Data length
  */
-__attribute__((used))
-void *_sbrk(ptrdiff_t incr)
+__attribute__((used)) void *_sbrk(ptrdiff_t incr)
 {
     extern char _end[];
     extern char _heap_end[];
@@ -246,3 +248,6 @@ void *_sbrk(ptrdiff_t incr)
     curbrk += incr;
     return curbrk - incr;
 }
+
+
+

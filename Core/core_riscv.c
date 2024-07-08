@@ -1,9 +1,9 @@
 /********************************** (C) COPYRIGHT  *******************************
- * File Name          : core_riscv.c
- * Author             : WCH
- * Version            : V1.0.1
- * Date               : 2023/11/11
- * Description        : RISC-V V4 Core Peripheral Access Layer Source File for CH32V20x
+* File Name          : core_riscv.c
+* Author             : WCH
+* Version            : V1.0.1
+* Date               : 2023/11/11
+* Description        : RISC-V V4 Core Peripheral Access Layer Source File for CH32V30x
 *********************************************************************************
 * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
 * Attention: This software (modified or not) and binary are used for 
@@ -13,24 +13,110 @@
 
 /* define compiler specific symbols */
 #if defined ( __CC_ARM   )
-  #define __ASM            __asm                                      /* asm keyword for ARM Compiler          */
-  #define __INLINE         __inline                                   /* inline keyword for ARM Compiler       */
+  #define __ASM            __asm                                      /*!< asm keyword for ARM Compiler          */
+  #define __INLINE         __inline                                   /*!< inline keyword for ARM Compiler       */
 
 #elif defined ( __ICCARM__ )
-  #define __ASM           __asm                                       /* asm keyword for IAR Compiler          */
-  #define __INLINE        inline                                      /* inline keyword for IAR Compiler. Only avaiable in High optimization mode */
+  #define __ASM           __asm                                       /*!< asm keyword for IAR Compiler          */
+  #define __INLINE        inline                                      /*!< inline keyword for IAR Compiler. Only avaiable in High optimization mode! */
 
 #elif defined   (  __GNUC__  )
-  #define __ASM            __asm                                      /* asm keyword for GNU Compiler          */
-  #define __INLINE         inline                                     /* inline keyword for GNU Compiler       */
+  #define __ASM            __asm                                      /*!< asm keyword for GNU Compiler          */
+  #define __INLINE         inline                                     /*!< inline keyword for GNU Compiler       */
 
 #elif defined   (  __TASKING__  )
-  #define __ASM            __asm                                      /* asm keyword for TASKING Compiler      */
-  #define __INLINE         inline                                     /* inline keyword for TASKING Compiler   */
+  #define __ASM            __asm                                      /*!< asm keyword for TASKING Compiler      */
+  #define __INLINE         inline                                     /*!< inline keyword for TASKING Compiler   */
 
 #endif
 
 
+/*********************************************************************
+ * @fn      __get_FFLAGS
+ *
+ * @brief   Return the Floating-Point Accrued Exceptions
+ *
+ * @return  fflags value
+ */
+uint32_t __get_FFLAGS(void)
+{
+  uint32_t result;
+
+  __ASM volatile ( "csrr %0," "fflags" : "=r" (result) );
+  return (result);
+}
+
+/*********************************************************************
+ * @fn      __set_FFLAGS
+ *
+ * @brief   Set the Floating-Point Accrued Exceptions
+ *
+ * @param   value  - set FFLAGS value
+ *
+ * @return  none
+ */
+void __set_FFLAGS(uint32_t value)
+{
+  __ASM volatile ("csrw fflags, %0" : : "r" (value) );
+}
+
+/*********************************************************************
+ * @fn      __get_FRM
+ *
+ * @brief   Return the Floating-Point Dynamic Rounding Mode
+ *
+ * @return  frm value
+ */
+uint32_t __get_FRM(void)
+{
+  uint32_t result;
+
+  __ASM volatile ( "csrr %0," "frm" : "=r" (result) );
+  return (result);
+}
+
+/*********************************************************************
+ * @fn      __set_FRM
+ *
+ * @brief   Set the Floating-Point Dynamic Rounding Mode
+ *
+ * @param   value  - set frm value
+ *
+ * @return  none
+ */
+void __set_FRM(uint32_t value)
+{
+  __ASM volatile ("csrw frm, %0" : : "r" (value) );
+}
+
+/*********************************************************************
+ * @fn      __get_FCSR
+ *
+ * @brief   Return the Floating-Point Control and Status Register
+ *
+ * @return  fcsr value
+ */
+uint32_t __get_FCSR(void)
+{
+  uint32_t result;
+
+  __ASM volatile ( "csrr %0," "fcsr" : "=r" (result) );
+  return (result);
+}
+
+/*********************************************************************
+ * @fn      __set_FCSR
+ *
+ * @brief   Set the Floating-Point Dynamic Rounding Mode
+ *
+ * @param   value  - set fcsr value
+ *
+ * @return  none
+ */
+void __set_FCSR(uint32_t value)
+{
+  __ASM volatile ("csrw fcsr, %0" : : "r" (value) );
+}
 
 /*********************************************************************
  * @fn      __get_MSTATUS

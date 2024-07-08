@@ -67,7 +67,6 @@ static int per_motor_write(propeller_attr *attr, float power_percent)
             duty_offset += duty_offset > 0 ? attr->deadzone_upper : attr->deadzone_lower;
             duty_offset *= attr->reversed == true ? -1 : 1;
         }
-        printf("powerp:%f duty_offset:%d", power_percent, duty_offset);
         if (pca9685_basic_write(attr->channel, 0.0f, us2percent(PROPELLER_DUTY_MID + duty_offset)) != 0)
             return -1;
         else
@@ -78,7 +77,7 @@ static int per_motor_write(propeller_attr *attr, float power_percent)
 
 int uvm_motor_write(propeller_params *cfg, motor_power_req req)
 {
-    printf("motor power req:%f %f %f %f %f %f", req.back_left, req.back_right, req.center_left, req.center_right, req.front_left, req.front_right);
+    printf("motor power req:%d %d %d %d %d %d", (int)(req.back_left*10), (int)(req.back_right*10), (int)(req.center_left*10), (int)(req.center_right*10), (int)(req.front_left*10), (int)(req.front_right*10));
     int ret = 0;
 
     #define PWM_COTROLLER_WRITE(propeller) ret += per_motor_write(&cfg->propeller, req.propeller);
