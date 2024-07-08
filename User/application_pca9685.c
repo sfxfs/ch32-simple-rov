@@ -8,7 +8,7 @@
 #include "application_pca9685.h"
 
 propeller_params default_params = {
-    .pwm_freq_offset = -2,
+    .pwm_freq_offset = -3,
     .front_right = {
         .channel = 7,
         .enabled = true,

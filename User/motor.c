@@ -77,7 +77,7 @@ static int per_motor_write(propeller_attr *attr, float power_percent)
 
 int uvm_motor_write(propeller_params *cfg, motor_power_req req)
 {
-    printf("motor power req:%d %d %d %d %d %d", (int)(req.back_left*10), (int)(req.back_right*10), (int)(req.center_left*10), (int)(req.center_right*10), (int)(req.front_left*10), (int)(req.front_right*10));
+    printf("\r\n ----------motor power req:\r\n -----------bL%d bR%d mL%d mR%d fl%d fr%d\r\n", (int)(req.back_left*100), (int)(req.back_right*100), (int)(req.center_left*100), (int)(req.center_right*100), (int)(req.front_left*100), (int)(req.front_right*100));
     int ret = 0;
 
     #define PWM_COTROLLER_WRITE(propeller) ret += per_motor_write(&cfg->propeller, req.propeller);
