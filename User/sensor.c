@@ -76,7 +76,8 @@ static void jy901_convert(uint8_t which, jy901_t *jy901)
             jy901->roll = (((jy901_raw.stcAngle.angle[1]<<8)|(jy901_raw.stcAngle.angle[0])) / 32768.0f*180); // 32768*180;
             jy901->pitch= (((jy901_raw.stcAngle.angle[3]<<8)|(jy901_raw.stcAngle.angle[2])) / 32768.0f*180);
             jy901->yaw  = (((jy901_raw.stcAngle.angle[5]<<8)|(jy901_raw.stcAngle.angle[4])) / 32768.0f*180);
-            //printf("angle %0.2f %0.2f %0.2f\n", jy901->roll, jy901->pitch, jy901->yaw);
+//            printf("angle %0.2f %0.2f %0.2f\r\n", jy901->roll, jy901->pitch, jy901->yaw);
+//            printf("angle %d %d %d\r\n",(int)jy901->roll, (int)jy901->pitch, (int)jy901->yaw);
         }
         break;
         case 0x54:
@@ -107,6 +108,7 @@ void jy901_cope_data(uint8_t data)
     static uint8_t rxCount = 0;        // ���ռ���
 
     rxBuffer[rxCount++] = data; // ���յ������ݴ��뻺������
+//    printf("data :  %d\r\n",data);
 
     if (rxBuffer[0] != 0x55)
     {

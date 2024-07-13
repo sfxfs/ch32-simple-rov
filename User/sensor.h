@@ -134,6 +134,8 @@ typedef struct
 
 } jy901_t;
 
+extern jy901_t jy901;
+
 void depth_sensor_cope_data(uint8_t data);
 void jy901_cope_data(uint8_t data);
 

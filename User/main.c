@@ -72,6 +72,7 @@ void USARTx_CFG(void)
     USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 
     USART_Init(USART2, &USART_InitStructure);
+    USART_InitStructure.USART_BaudRate = 9600;
     USART_Init(USART3, &USART_InitStructure);
 
     USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
