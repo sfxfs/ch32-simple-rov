@@ -269,7 +269,7 @@ char *rpc_process(rpc_handle_t *handle, const char *json_req, size_t req_len)
         goto req_error;
     }
 
-    printf("Recv json str:\n%s\r\n", json_req);
+//    printf("Recv json str:\n%s\r\n", json_req);
 
     cJSON *request = cJSON_Parse(json_req);
     if (request == NULL)
@@ -305,6 +305,6 @@ req_error:
         free(handle->message.str_array);
         memset(&handle->message, 0, sizeof(str_free_t));
     }
-
+    printf("return json str:\n%s\r\n", str_return);
     return str_return;
 }

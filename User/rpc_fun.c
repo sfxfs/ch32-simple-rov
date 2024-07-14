@@ -19,10 +19,6 @@
 #define us2percent(us) (((us)*100.0)/20000.0) // 一个周期 20 ms
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt))) //限幅函数
 
-//extern jy901_t jy901;
-//extern float ms5837_temperature;
-//extern float ms5837_depth;
-
 /**
  * @brief ��ȡ json �ڶ�Ӧֵ
  * @param params cjson�ṹ��
@@ -58,10 +54,12 @@ static cJSON *get_rov_info()
     cJSON_AddStringToObject(cjson_info, "Model", "CH32");
 //    sprintf(temp_str, "%.02f", ms5837_temperature);
 //    cJSON_AddStringToObject(cjson_info, "Temp", temp_str);
+    jy901_convert();
     sprintf(temp_str, "%.02f", jy901.yaw);
     cJSON_AddStringToObject(cjson_info, "Yaw", temp_str);
-//    sprintf(temp_str, "%.02f", ms5837_depth);
-//    cJSON_AddStringToObject(cjson_info, "Depth", temp_str);
+    depth_data_convert();
+    sprintf(temp_str, "%.02f", ms5837_depth);
+    cJSON_AddStringToObject(cjson_info, "Depth", temp_str);
     return cjson_info;
 }
 
