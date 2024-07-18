@@ -2,6 +2,8 @@
 
 此为2024年全国大学生嵌入式芯片与系统设计竞赛参赛作品。
 
+使用了 CH32V307 芯片，flash 配置为 256KB + 64KB
+
 A simple ROV control program using the CH32V/F series MCU
 
 Functions currently implemented:
