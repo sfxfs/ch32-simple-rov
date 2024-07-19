@@ -348,14 +348,14 @@ void WCHNET_MainTask(void)
  */
 void ETH_LedLinkSet( uint8_t mode )
 {
-    if( mode == LED_OFF )
-    {
-        GPIO_SetBits(GPIOC, GPIO_Pin_0);
-    }
-    else
-    {
-        GPIO_ResetBits(GPIOC, GPIO_Pin_0);
-    }
+//    if( mode == LED_OFF )
+//    {
+//        GPIO_SetBits(GPIOC, GPIO_Pin_0);
+//    }
+//    else
+//    {
+//        GPIO_ResetBits(GPIOC, GPIO_Pin_0);
+//    }
 }
 
 /*********************************************************************
@@ -367,14 +367,14 @@ void ETH_LedLinkSet( uint8_t mode )
  */
 void ETH_LedDataSet( uint8_t mode )
 {
-    if( mode == LED_OFF )
-    {
-        GPIO_SetBits(GPIOC, GPIO_Pin_1);
-    }
-    else
-    {
-        GPIO_ResetBits(GPIOC, GPIO_Pin_1);
-    }
+//    if( mode == LED_OFF )
+//    {
+//        GPIO_SetBits(GPIOC, GPIO_Pin_1);
+//    }
+//    else
+//    {
+//        GPIO_ResetBits(GPIOC, GPIO_Pin_1);
+//    }
 }
 
 /*********************************************************************
@@ -388,15 +388,15 @@ void ETH_LedDataSet( uint8_t mode )
  */
 void ETH_LedConfiguration(void)
 {
-    GPIO_InitTypeDef  GPIO={0};
-
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE);
-    GPIO.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1;
-    GPIO.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOC,&GPIO);
-    ETH_LedDataSet(LED_OFF);
-    ETH_LedLinkSet(LED_OFF);
+//    GPIO_InitTypeDef  GPIO={0};
+//
+//    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE);
+//    GPIO.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1;
+//    GPIO.GPIO_Mode = GPIO_Mode_Out_PP;
+//    GPIO.GPIO_Speed = GPIO_Speed_50MHz;
+//    GPIO_Init(GPIOC,&GPIO);
+//    ETH_LedDataSet(LED_OFF);
+//    ETH_LedLinkSet(LED_OFF);
 }
 
 /*********************************************************************

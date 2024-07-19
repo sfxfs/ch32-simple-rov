@@ -68,7 +68,7 @@ void server_routine(char *rx_buf, size_t len)
         if(rx_buf[0] == 0x33)
         {
             printf("recv config\r\n");
-//            config_handle(rx_buf, TxBuffer1);
+            config_handle(rx_buf, TxBuffer1);
             return;
         }
         printf("no a http request.\r\n");
