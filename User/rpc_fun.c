@@ -82,7 +82,7 @@ cJSON *info_handler(jrpc_context *ctx, cJSON *params, cJSON *id)
 cJSON *catcher(jrpc_context *ctx, cJSON *params, cJSON *id)
 {
     int arm_catch;
-    static float cur = 1000.0f;
+    static int cur = 1500;
     cur = constrain(cur,500,2500);
 
     if (params == NULL) return cJSON_CreateNull();
@@ -90,10 +90,9 @@ cJSON *catcher(jrpc_context *ctx, cJSON *params, cJSON *id)
     //pca9685 control -- 通道1 -- 机械臂
     if (arm_catch > 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur+=25),0,100));
     else if (arm_catch < 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur-=25),0,100));
-    else {
-        pca9685_basic_write(1, 0.0f,us2percent(cur));
-    }
-    //
+//    else {
+//        pca9685_basic_write(1, 0.0f,us2percent(cur));
+//    }
     return cJSON_CreateNull();
 }
 

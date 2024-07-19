@@ -38,6 +38,8 @@ int uvm_motor_init(propeller_params *cfg)
     printf("pca9685 init finished.");
     int ret = 0;
 
+    pca9685_basic_write(1, 0.0f,us2percent(1500));
+
     #define PWM_COTROLLER_WRITE(propeller) ret += per_motor_init(&cfg->propeller);
     CALL_FOR_ALL_PROPELLER(PWM_COTROLLER_WRITE);
     #undef PWM_COTROLLER_WRITE
