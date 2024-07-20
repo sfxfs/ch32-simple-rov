@@ -7,17 +7,17 @@ void rov_depth_control(motor_power_req *req, double z)
 
        if (z >= 0.03)      // 上升使用正向动力 positive
        {
-           req->center_left  = z * default_params.center_left.power_positive *
+           req->center_left  = 0.3*z * default_params.center_left.power_positive *
                                    default_params.center_left.enabled ;
-           req->center_right = z * default_params.center_right.power_positive *
+           req->center_right = 0.3*z * default_params.center_right.power_positive *
                                    default_params.center_right.enabled;
 //           printf("\r\ncenter_L: %d----------center_R: %d\r\n",(int)(req->center_left*100),(int)(req->center_right*100));
        }
        else if(z <= -0.03) // 上升使用反向动力 negative
        {
-           req->center_left  = z * default_params.center_left.power_negative *
+           req->center_left  = 0.3*z * default_params.center_left.power_negative *
                                                   default_params.center_left.enabled ;
-           req->center_right = z * default_params.center_right.power_negative *
+           req->center_right = 0.3*z * default_params.center_right.power_negative *
                                                   default_params.center_right.enabled;
        }
        else {
@@ -44,40 +44,40 @@ void horizontal_control(motor_power_req *req, double x, double y, double z, doub
                                 //2 * 反转 * 使能 *
                                 //((手柄x * 正向动力百分比 + 手柄y 推进器安装方向 *
                                 //反向动力百分比 * 2 ) - 手柄yaw
-    req->back_left      =  default_params.back_left.enabled *
+    req->back_left      =  0.3*default_params.back_left.enabled *
                                 (
                                     + x * default_params.back_left.power_positive
-                                    + y * default_params.back_left.power_negative
+                                    - y * default_params.back_left.power_negative
                                     - r * default_params.back_left.power_positive
                                 );
-    req->back_left = clamp(req->back_left, -1.0f, 1.0f);
+    req->back_left = clamp(req->back_left, -0.7f, 0.7f);
 
 
-    req->back_right     = default_params.back_right.enabled *
+    req->back_right     = 0.3*default_params.back_right.enabled *
                                 (
                                     + x * default_params.back_right.power_positive
                                     + y * default_params.back_right.power_negative
                                     - r * default_params.back_right.power_positive
                                  );
-    req->back_right = clamp(req->back_right, -1.0f, 1.0f);
+    req->back_right = clamp(req->back_right, -0.7f, 0.7f);
 
 
-    req->front_left     = default_params.front_left.enabled *
+    req->front_left     = 0.3*default_params.front_left.enabled *
                                 (
                                     + x * default_params.front_left.power_positive
                                     + y * default_params.front_left.power_negative
-                                    - r * default_params.front_left.power_positive
+                                    + r * default_params.front_left.power_positive
                                 );
-    req->front_left = clamp(req->front_left, -1.0f, 1.0f);
+    req->front_left = clamp(req->front_left, -0.7f, 0.7f);
 
 
-    req->front_right   = default_params.front_right.enabled *
+    req->front_right   = 0.3*default_params.front_right.enabled *
                                 (
                                     + x * default_params.front_right.power_positive
-                                    + y * default_params.front_right.power_negative
-                                    - r * default_params.front_right.power_positive
+                                    - y * default_params.front_right.power_negative
+                                    + r * default_params.front_right.power_positive
                                 );
-    req->front_right = clamp(req->front_right, -1.0f, 1.0f);
+    req->front_right = clamp(req->front_right, -0.7f, 0.7f);
 
 }
 
