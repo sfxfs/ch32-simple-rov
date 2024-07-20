@@ -18,6 +18,7 @@ float ms5837_temperature;
 float ms5837_depth;
 
 char depth_data[30];
+char jy901_data[6];
 
 volatile int jy901_data_update;
 volatile int depth_data_update;
@@ -69,6 +70,13 @@ void jy901_convert()
     if (jy901_data_update != 1)
         return;
 
+    jy901_raw.stcAngle.angle[0] =  jy901_data[0];
+    jy901_raw.stcAngle.angle[1] =  jy901_data[1];
+    jy901_raw.stcAngle.angle[2] =  jy901_data[2];
+    jy901_raw.stcAngle.angle[3] =  jy901_data[3];
+    jy901_raw.stcAngle.angle[4] =  jy901_data[4];
+    jy901_raw.stcAngle.angle[5] =  jy901_data[5];
+
     jy901.roll = (((jy901_raw.stcAngle.angle[1]<<8)|(jy901_raw.stcAngle.angle[0])) / 32768.0f*180); // 32768*180;
     jy901.pitch= (((jy901_raw.stcAngle.angle[3]<<8)|(jy901_raw.stcAngle.angle[2])) / 32768.0f*180);
     jy901.yaw  = (((jy901_raw.stcAngle.angle[5]<<8)|(jy901_raw.stcAngle.angle[4])) / 32768.0f*180);
@@ -103,7 +111,7 @@ void jy901_cope_data(uint8_t data)
         if (rxCheck == rxBuffer[JY901_PACKET_LENGTH - 1]) // �ж����ݰ�У���Ƿ���ȷ
         {
             jy901_data_update = 1;
-            memcpy(&jy901_raw.stcAngle.angle[0], &rxBuffer[2], 6);
+            memcpy(jy901_data, &rxBuffer[2], 6);
         }
     }
     rxCount = 0; // ��ջ�����

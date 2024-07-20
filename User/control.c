@@ -44,40 +44,40 @@ void horizontal_control(motor_power_req *req, double x, double y, double z, doub
                                 //2 * 反转 * 使能 *
                                 //((手柄x * 正向动力百分比 + 手柄y 推进器安装方向 *
                                 //反向动力百分比 * 2 ) - 手柄yaw
-    req->back_left      =  0.3*default_params.back_left.enabled *
+    req->back_left      =  0.2*default_params.back_left.enabled *
                                 (
                                     + x * default_params.back_left.power_positive
                                     - y * default_params.back_left.power_negative
                                     - r * default_params.back_left.power_positive
                                 );
-    req->back_left = clamp(req->back_left, -0.7f, 0.7f);
+    req->back_left = clamp(req->back_left, -0.3f, 0.3f);
 
 
-    req->back_right     = 0.3*default_params.back_right.enabled *
+    req->back_right     = 0.2*default_params.back_right.enabled *
                                 (
                                     + x * default_params.back_right.power_positive
                                     + y * default_params.back_right.power_negative
                                     - r * default_params.back_right.power_positive
                                  );
-    req->back_right = clamp(req->back_right, -0.7f, 0.7f);
+    req->back_right = clamp(req->back_right, -0.3f, 0.3f);
 
 
-    req->front_left     = 0.3*default_params.front_left.enabled *
+    req->front_left     = 0.2*default_params.front_left.enabled *
                                 (
                                     + x * default_params.front_left.power_positive
                                     + y * default_params.front_left.power_negative
                                     + r * default_params.front_left.power_positive
                                 );
-    req->front_left = clamp(req->front_left, -0.7f, 0.7f);
+    req->front_left = clamp(req->front_left, -0.3f, 0.3f);
 
 
-    req->front_right   = 0.3*default_params.front_right.enabled *
+    req->front_right   = 0.2*default_params.front_right.enabled *
                                 (
                                     + x * default_params.front_right.power_positive
                                     - y * default_params.front_right.power_negative
                                     + r * default_params.front_right.power_positive
                                 );
-    req->front_right = clamp(req->front_right, -0.7f, 0.7f);
+    req->front_right = clamp(req->front_right, -0.3f, 0.3f);
 
 }
 

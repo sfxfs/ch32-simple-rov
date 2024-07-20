@@ -35,7 +35,7 @@ u8 socket[WCHNET_MAX_SOCKET_NUM];                       //Save the currently con
 u8 SocketRecvBuf[WCHNET_MAX_SOCKET_NUM][RECE_BUF_LEN];  //socket receive buffer
 u8 MyBuf[RECE_BUF_LEN];
 
-void USART2_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void UART6_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void USART3_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 
 void USARTx_CFG(void)
@@ -44,17 +44,17 @@ void USARTx_CFG(void)
     USART_InitTypeDef USART_InitStructure = {0};
     NVIC_InitTypeDef  NVIC_InitStructure = {0};
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2 | RCC_APB1Periph_USART3, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART6 | RCC_APB1Periph_USART3, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOB, ENABLE);
 
-    /* USART2 TX-->A.2   RX-->A.3 */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+    /* UART6 TX-->C.0   RX-->C.1 */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
     /* USART3 TX-->B.10  RX-->B.11 */
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -71,14 +71,14 @@ void USARTx_CFG(void)
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 
-    USART_Init(USART2, &USART_InitStructure);
+    USART_Init(UART6, &USART_InitStructure);
 
     USART_InitStructure.USART_BaudRate = 9600;
 
     USART_Init(USART3, &USART_InitStructure);
 
-    USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
-    NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+    USART_ITConfig(UART6, USART_IT_RXNE, ENABLE);
+    NVIC_InitStructure.NVIC_IRQChannel = UART6_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -91,7 +91,7 @@ void USARTx_CFG(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    USART_Cmd(USART2, ENABLE);
+    USART_Cmd(UART6, ENABLE);
     USART_Cmd(USART3, ENABLE);
 }
 
@@ -361,11 +361,11 @@ int main(void)
     }
 }
 
-void USART2_IRQHandler(void)
+void UART6_IRQHandler(void)
 {
-    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
+    if(USART_GetITStatus(UART6, USART_IT_RXNE) != RESET)
     {
-        depth_sensor_cope_data(USART_ReceiveData(USART2));
+        depth_sensor_cope_data(USART_ReceiveData(UART6));
     }
 }
 
