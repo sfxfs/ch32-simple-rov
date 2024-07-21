@@ -88,13 +88,14 @@ cJSON *catcher(jrpc_context *ctx, cJSON *params, cJSON *id)
 {
     int arm_catch;
     static int cur = 1500;
+
     cur = constrain(cur,1400,2100);
 
     if (params == NULL) return cJSON_CreateNull();
     arm_catch = params->child->valuedouble;
     //pca9685 control -- 通道1 -- 机械臂
-    if (arm_catch > 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur+=15),0,100));
-    else if (arm_catch < 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur-=15),0,100));
+    if (arm_catch > 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur+=20),0,100));
+    else if (arm_catch < 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur-=20),0,100));
 //    else {
 //        pca9685_basic_write(1, 0.0f,us2percent(cur));
 //    }

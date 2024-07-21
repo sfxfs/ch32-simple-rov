@@ -39,6 +39,8 @@ void horizontal_control(motor_power_req *req, double x, double y, double z, doub
 
     if (y > -0.03 && y < 0.03)  y  = 0;
     if (x > -0.03 && x < 0.03)  x  = 0;
+    x = x*1.2;
+    if (x<0) x = x*1.3;
     if (r > -0.03 && r < 0.03)  r = 0;
 
                                 //2 * 反转 * 使能 *
