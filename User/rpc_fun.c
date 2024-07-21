@@ -42,24 +42,29 @@ static double cjson_value_analysis_double(cJSON *params,const char *str)
 
 static int rpc_manual_ctrl(double x, double y, double z, double r)
 {
-    printf("manual ctrl cmd recv: x|%lf y|%lf z|%lf r|%lf\r\n", x, y, z, r);
+//    printf("manual ctrl cmd recv: x|%lf y|%lf z|%lf r|%lf\r\n", x, y, z, r);
     uvm_motor_write(&default_params, uvm_manual_ctrl(x, y, z, r));
     return 0;
 }
 
 static cJSON *get_rov_info()
 {
-    static char temp_str[20] = {0};
+    static char temp_str[10] = {0};
     cJSON *cjson_info = cJSON_CreateObject();
-    cJSON_AddStringToObject(cjson_info, "Model", "CH32");
-//    sprintf(temp_str, "%.02f", ms5837_temperature);
-//    cJSON_AddStringToObject(cjson_info, "Temp", temp_str);
+//    cJSON_AddStringToObject(cjson_info, "Model", "CH32");
+
     jy901_convert();
+
     sprintf(temp_str, "%.02f", jy901.yaw);
     cJSON_AddStringToObject(cjson_info, "Yaw", temp_str);
+
     depth_data_convert();
-    sprintf(temp_str, "%.02f", ms5837_depth);
+
+    sprintf(temp_str, "%d", ms5837_depth);
     cJSON_AddStringToObject(cjson_info, "Depth", temp_str);
+    sprintf(temp_str, "%d", ms5837_temperature);
+    cJSON_AddStringToObject(cjson_info, "Temp", temp_str);
+
     return cjson_info;
 }
 
@@ -83,16 +88,17 @@ cJSON *catcher(jrpc_context *ctx, cJSON *params, cJSON *id)
 {
     int arm_catch;
     static int cur = 1500;
-    cur = constrain(cur,500,2500);
+    cur = constrain(cur,1400,2100);
 
     if (params == NULL) return cJSON_CreateNull();
     arm_catch = params->child->valuedouble;
     //pca9685 control -- 通道1 -- 机械臂
-    if (arm_catch > 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur+=25),0,100));
-    else if (arm_catch < 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur-=25),0,100));
+    if (arm_catch > 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur+=15),0,100));
+    else if (arm_catch < 0) pca9685_basic_write(1, 0.0f,constrain(us2percent(cur-=15),0,100));
 //    else {
 //        pca9685_basic_write(1, 0.0f,us2percent(cur));
 //    }
+//    printf("cur:%d\r\n", cur);
     return cJSON_CreateNull();
 }
 

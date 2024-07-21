@@ -38,7 +38,7 @@ int uvm_motor_init(propeller_params *cfg)
     printf("pca9685 init finished.");
     int ret = 0;
 
-    pca9685_basic_write(1, 0.0f,us2percent(1500));
+    pca9685_basic_write(1, 0.0f,us2percent(1400)); // arm init
 
     #define PWM_COTROLLER_WRITE(propeller) ret += per_motor_init(&cfg->propeller);
     CALL_FOR_ALL_PROPELLER(PWM_COTROLLER_WRITE);
@@ -79,7 +79,7 @@ static int per_motor_write(propeller_attr *attr, float power_percent)
 
 int uvm_motor_write(propeller_params *cfg, motor_power_req req)
 {
-    printf("\r\n ----------motor power req:\r\n -----------bL%d bR%d mL%d mR%d fl%d fr%d\r\n", (int)(req.back_left*100), (int)(req.back_right*100), (int)(req.center_left*100), (int)(req.center_right*100), (int)(req.front_left*100), (int)(req.front_right*100));
+//    printf("\r\n ----------motor power req:\r\n -----------bL%d bR%d mL%d mR%d fl%d fr%d\r\n", (int)(req.back_left*100), (int)(req.back_right*100), (int)(req.center_left*100), (int)(req.center_right*100), (int)(req.front_left*100), (int)(req.front_right*100));
     int ret = 0;
 
     #define PWM_COTROLLER_WRITE(propeller) ret += per_motor_write(&cfg->propeller, req.propeller);

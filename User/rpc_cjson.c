@@ -305,6 +305,6 @@ req_error:
         free(handle->message.str_array);
         memset(&handle->message, 0, sizeof(str_free_t));
     }
-//    printf("return json str:\n%s\r\n", str_return);
+    printf("return json str:\n%s\r\n", str_return);
     return str_return;
 }

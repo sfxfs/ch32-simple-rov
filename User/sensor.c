@@ -14,8 +14,8 @@
 
 static jy901_raw_t jy901_raw;
 jy901_t jy901;
-float ms5837_temperature;
-float ms5837_depth;
+int ms5837_temperature;
+int ms5837_depth;
 
 char depth_data[30];
 char jy901_data[6];
