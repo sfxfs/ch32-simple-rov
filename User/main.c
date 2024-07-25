@@ -33,7 +33,7 @@ u16 srcport = 8888;                                     //source port
 u8 SocketIdForListen;                                   //Socket for Listening
 u8 socket[WCHNET_MAX_SOCKET_NUM];                       //Save the currently connected socket
 u8 SocketRecvBuf[WCHNET_MAX_SOCKET_NUM][RECE_BUF_LEN];  //socket receive buffer
-u8 MyBuf[RECE_BUF_LEN];
+// u8 MyBuf[RECE_BUF_LEN];
 
 void UART6_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
 void USART3_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));

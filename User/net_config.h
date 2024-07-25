@@ -81,11 +81,11 @@ extern "C" {
 /* If you want to achieve a higher transmission speed,
  * try to increase RECE_BUF_LEN to (WCHNET_TCP_MSS*4)
  * and increase WCHNET_NUM_TCP_SEG to (WCHNET_NUM_TCP*4)*/
-#define RECE_BUF_LEN                  (WCHNET_TCP_MSS*2)   /* socket receive buffer size */
+#define RECE_BUF_LEN                  (WCHNET_TCP_MSS*4)   /* socket receive buffer size */
 
 #define WCHNET_NUM_PBUF               WCHNET_NUM_POOL_BUF   /* Number of PBUF structures */
 
-#define WCHNET_NUM_TCP_SEG            (WCHNET_NUM_TCP*2)   /* The number of TCP segments used to send */
+#define WCHNET_NUM_TCP_SEG            (WCHNET_NUM_TCP*4)   /* The number of TCP segments used to send */
 
 #define WCHNET_MEM_HEAP_SIZE          (((WCHNET_TCP_MSS+0x10+54+8)*WCHNET_NUM_TCP_SEG)+ETH_TX_BUF_SZE+64+2*0x18) /* memory heap size */
 
