@@ -26,18 +26,10 @@ struct jrpc_procedure {
     void *data;
 };
 
-typedef struct str_free
-{
-    char **str_array;
-    int total;
-    int cur;
-} str_free_t;
-
 typedef struct rpc_handle
 {
     int procedure_count;
     struct jrpc_procedure *procedures;
-    str_free_t message;
 } rpc_handle_t;
 
 int   rpc_add_method (rpc_handle_t *handle, jrpc_function function_pointer, char *name, void * data);

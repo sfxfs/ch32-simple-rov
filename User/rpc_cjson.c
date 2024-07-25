@@ -5,12 +5,12 @@
 #include <string.h>
 
 /**
- * @brief Ìí¼Ó»Øµ÷·½·¨
- * @param handle rpc ¾ä±ú
- * @param function_pointer »Øµ÷·½·¨µÄÖ¸Õë
- * @param name »Øµ÷µÄ·½·¨Ãû
- * @param data ´«Èë»Øµ÷º¯ÊýµÄÊý¾Ý
- * @return ³É¹¦·µ»Ø 0£¬Ê§°Ü·µ»Ø -1
+ * @brief ï¿½ï¿½ï¿½Ó»Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param handle rpc ï¿½ï¿½ï¿½
+ * @param function_pointer ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+ * @param name ï¿½Øµï¿½ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param data ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @return ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½Ê§ï¿½Ü·ï¿½ï¿½ï¿½ -1
  */
 int rpc_add_method(rpc_handle_t *handle, jrpc_function function_pointer, char *name, void *data)
 {
@@ -36,8 +36,8 @@ int rpc_add_method(rpc_handle_t *handle, jrpc_function function_pointer, char *n
 }
 
 /**
- * @brief Ïú»Ù procedure ½á¹¹Ìå
- * @param procedure ½á¹¹ÌåÖ¸Õë
+ * @brief ï¿½ï¿½ï¿½ï¿½ procedure ï¿½á¹¹ï¿½ï¿½
+ * @param procedure ï¿½á¹¹ï¿½ï¿½Ö¸ï¿½ï¿½
  */
 static void procedure_destroy(struct jrpc_procedure *procedure)
 {
@@ -54,10 +54,10 @@ static void procedure_destroy(struct jrpc_procedure *procedure)
 }
 
 /**
- * @brief É¾³ý»Øµ÷·½·¨
- * @param handle rpc ¾ä±ú
- * @param name ·½·¨Ãû
- * @return ³É¹¦·µ»Ø 0£¬Ê§°Ü·µ»Ø -1
+ * @brief É¾ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param handle rpc ï¿½ï¿½ï¿½
+ * @param name ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @return ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½Ê§ï¿½Ü·ï¿½ï¿½ï¿½ -1
  */
 int rpc_del_method(rpc_handle_t *handle, char *name)
 {
@@ -104,10 +104,10 @@ int rpc_del_method(rpc_handle_t *handle, char *name)
 }
 
 /**
- * @brief ¹¹Ôì³É¹¦µ÷ÓÃ»Øµ÷º¯ÊýµÄÊý¾Ý°ü
- * @param result »Øµ÷º¯ÊýµÄ·µ»Ø
- * @param id ÇëÇóµÄ id ºÅ
- * @return ·µ»Ø¹¹ÔìÍêµÄÊý¾Ý°ü
+ * @brief ï¿½ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½Ã»Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½
+ * @param result ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
+ * @param id ï¿½ï¿½ï¿½ï¿½ï¿½ id ï¿½ï¿½
+ * @return ï¿½ï¿½ï¿½Ø¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½
  */
 static cJSON *rpc_ok(cJSON *result, cJSON *id)
 {
@@ -124,11 +124,11 @@ static cJSON *rpc_ok(cJSON *result, cJSON *id)
 }
 
 /**
- * @brief ¹¹ÔìÊ§°Üµ÷ÓÃ»Øµ÷º¯ÊýµÄÊý¾Ý°ü
- * @param code ´íÎó´úÂë
- * @param message ´íÎóÐÅÏ¢
- * @param id ÇëÇóµÄ id ºÅ
- * @return ·µ»Ø¹¹ÔìÍêµÄÊý¾Ý°ü
+ * @brief ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Üµï¿½ï¿½Ã»Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½
+ * @param code ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param message ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+ * @param id ï¿½ï¿½ï¿½ï¿½ï¿½ id ï¿½ï¿½
+ * @return ï¿½ï¿½ï¿½Ø¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½
  */
 static cJSON *rpc_err(rpc_handle_t *handle, int code, char *message, cJSON *id)
 {
@@ -139,15 +139,7 @@ static cJSON *rpc_err(rpc_handle_t *handle, int code, char *message, cJSON *id)
 
     cJSON_AddNumberToObject(error_root, "code", code);
     if (message)
-    {
-        if (handle->message.total++ == 0)
-            handle->message.str_array = malloc(handle->message.total * sizeof(char *));
-        else
-            handle->message.str_array = realloc(handle->message.str_array, handle->message.total * sizeof(char *));
-        handle->message.str_array[handle->message.cur++] = message;
-
         cJSON_AddStringToObject(error_root, "message", message);
-    }
 
     cJSON_AddStringToObject(result_root, "jsonrpc", JRPC_VERSION);
     cJSON_AddItemToObject(result_root, "error", error_root);
@@ -160,12 +152,12 @@ static cJSON *rpc_err(rpc_handle_t *handle, int code, char *message, cJSON *id)
 }
 
 /**
- * @brief µ÷ÓÃ»Øµ÷º¯Êý
- * @param handle rpc ¾ä±ú
- * @param name »Øµ÷º¯Êý·½·¨Ãû
- * @param params »Øµ÷º¯Êý´«²Î
- * @param id ÇëÇóµÄ id ºÅ
- * @return ·µ»Øµ÷ÓÃµÄ½á¹û
+ * @brief ï¿½ï¿½ï¿½Ã»Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param handle rpc ï¿½ï¿½ï¿½
+ * @param name ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param params ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param id ï¿½ï¿½ï¿½ï¿½ï¿½ id ï¿½ï¿½
+ * @return ï¿½ï¿½ï¿½Øµï¿½ï¿½ÃµÄ½ï¿½ï¿½
  */
 static cJSON *invoke_procedure(rpc_handle_t *handle, char *name, cJSON *params, cJSON *id)
 {
@@ -188,7 +180,7 @@ static cJSON *invoke_procedure(rpc_handle_t *handle, char *name, cJSON *params, 
     if (!procedure_found)
     {
         printf("Method '%s' not found.\r\n", name);
-        return rpc_err(handle, JRPC_METHOD_NOT_FOUND, strdup("Method not found."), id);
+        return rpc_err(handle, JRPC_METHOD_NOT_FOUND, "Method not found.", id);
     }
     else
     {
@@ -200,16 +192,16 @@ static cJSON *invoke_procedure(rpc_handle_t *handle, char *name, cJSON *params, 
 }
 
 /**
- * @brief µ÷ÓÃ»Øµ÷º¯Êý
- * @param handle rpc ¾ä±ú
- * @param request rpc µ÷ÓÃÇëÇóÊý¾Ý°ü
- * @return ·µ»Øµ÷ÓÃµÄ½á¹û
+ * @brief ï¿½ï¿½ï¿½Ã»Øµï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param handle rpc ï¿½ï¿½ï¿½
+ * @param request rpc ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½
+ * @return ï¿½ï¿½ï¿½Øµï¿½ï¿½ÃµÄ½ï¿½ï¿½
  */
 static cJSON *rpc_invoke_method(rpc_handle_t *handle, cJSON *request)
 {
     cJSON *method, *params, *id;
     if (strcmp("2.0", cJSON_GetObjectItem(request, "jsonrpc")->valuestring) != 0)
-        return rpc_err(handle, JRPC_INVALID_REQUEST, strdup("Valid request received: JSONRPC version error."), NULL);
+        return rpc_err(handle, JRPC_INVALID_REQUEST, "Valid request received: JSONRPC version error.", NULL);
     method = cJSON_GetObjectItem(request, "method");
     if (method != NULL && method->type == cJSON_String)
     {
@@ -227,22 +219,22 @@ static cJSON *rpc_invoke_method(rpc_handle_t *handle, cJSON *request)
             printf("Method Invoked: %s.\r\n", method->valuestring);
             return invoke_procedure(handle, method->valuestring, params, id_copy);
         }
-        return rpc_err(handle, JRPC_INVALID_REQUEST, strdup("Valid request received: No 'id' member"), NULL);
+        return rpc_err(handle, JRPC_INVALID_REQUEST, "Valid request received: No 'id' member", NULL);
     }
-    return rpc_err(handle, JRPC_INVALID_REQUEST, strdup("Valid request received: No 'method' member"), NULL);
+    return rpc_err(handle, JRPC_INVALID_REQUEST, "Valid request received: No 'method' member", NULL);
 }
 
 /**
- * @brief µ÷ÓÃ»Øµ÷º¯Êý£¨Êý×éÐÎÊ½£©
- * @param handle rpc ¾ä±ú
- * @param request rpc µ÷ÓÃÇëÇóÊý¾Ý°ü
- * @return ·µ»Øµ÷ÓÃµÄ½á¹û
+ * @brief ï¿½ï¿½ï¿½Ã»Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½
+ * @param handle rpc ï¿½ï¿½ï¿½
+ * @param request rpc ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½
+ * @return ï¿½ï¿½ï¿½Øµï¿½ï¿½ÃµÄ½ï¿½ï¿½
  */
 static cJSON *rpc_invoke_method_array(rpc_handle_t *handle, cJSON *request)
 {
     int array_size = cJSON_GetArraySize(request);
     if (array_size <= 0)
-        return rpc_err(handle, JRPC_INVALID_REQUEST, strdup("Valid request received: Empty JSON array."), NULL);
+        return rpc_err(handle, JRPC_INVALID_REQUEST, "Valid request received: Empty JSON array.", NULL);
 
     cJSON *return_json_array = cJSON_CreateArray();
     for (int i = 0; i < array_size; i++)
@@ -252,11 +244,11 @@ static cJSON *rpc_invoke_method_array(rpc_handle_t *handle, cJSON *request)
 }
 
 /**
- * @brief jsonrpc ´¦Àíº¯Êý
- * @param handle rpc ¾ä±ú
- * @param json_req json ¸ñÊ½µÄÇëÇóÊý¾Ý
- * @param req_len ÇëÇóÊý¾ÝµÄ³¤¶È
- * @return ·µ»ØÇëÇó½á¹ûµÄ×Ö·û´®
+ * @brief jsonrpc ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param handle rpc ï¿½ï¿½ï¿½
+ * @param json_req json ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * @param req_len ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÝµÄ³ï¿½ï¿½ï¿½
+ * @return ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
  */
 char *rpc_process(rpc_handle_t *handle, const char *json_req, size_t req_len)
 {
@@ -265,7 +257,7 @@ char *rpc_process(rpc_handle_t *handle, const char *json_req, size_t req_len)
     if (json_req == NULL || req_len <= 0)
     {
         printf("Empty Request Received.\r\n");
-        str_return = cJSON_PrintUnformatted(rpc_err(handle, JRPC_PARSE_ERROR, strdup("Parse error: Not in JSON format."), NULL));
+        str_return = cJSON_PrintUnformatted(rpc_err(handle, JRPC_PARSE_ERROR, "Parse error: Not in JSON format.", NULL));
         goto req_error;
     }
 
@@ -275,7 +267,7 @@ char *rpc_process(rpc_handle_t *handle, const char *json_req, size_t req_len)
     if (request == NULL)
     {
         printf("Valid JSON Received.\r\n");
-        str_return = cJSON_PrintUnformatted(rpc_err(handle, JRPC_PARSE_ERROR, strdup("Parse error: Not in JSON format."), NULL));
+        str_return = cJSON_PrintUnformatted(rpc_err(handle, JRPC_PARSE_ERROR, "Parse error: Not in JSON format.", NULL));
         goto req_error;
     }
 
@@ -290,7 +282,7 @@ char *rpc_process(rpc_handle_t *handle, const char *json_req, size_t req_len)
     }
     else
     {
-        cjson_return = rpc_err(handle, JRPC_INVALID_REQUEST, strdup("Valid request received: Not a JSON object or array."), NULL);
+        cjson_return = rpc_err(handle, JRPC_INVALID_REQUEST, "Valid request received: Not a JSON object or array.", NULL);
     }
 
     str_return = cJSON_PrintUnformatted(cjson_return);
@@ -298,13 +290,6 @@ char *rpc_process(rpc_handle_t *handle, const char *json_req, size_t req_len)
     cJSON_Delete(request);
 
 req_error:
-    if (handle->message.total != 0)
-    {
-        for (int i = 0; i < handle->message.total; i++)
-            free(handle->message.str_array[i]);
-        free(handle->message.str_array);
-        memset(&handle->message, 0, sizeof(str_free_t));
-    }
     printf("return json str:\n%s\r\n", str_return);
     return str_return;
 }

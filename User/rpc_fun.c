@@ -110,11 +110,10 @@ cJSON *empty_handler(jrpc_context *ctx, cJSON *params, cJSON *id)
 
 cJSON *manual_ctrl(jrpc_context *ctx, cJSON *params, cJSON *id)
 {
-    if (rpc_manual_ctrl(cjson_value_analysis_double(params, "x"), cjson_value_analysis_double(params, "y"), cjson_value_analysis_double(params, "z"), cjson_value_analysis_double(params, "rot")) != 0)
-    {
-        ctx->error_code = JRPC_INTERNAL_ERROR;
-        ctx->error_message = strdup("Write to pwm controller failed.");
-    }
+    rpc_manual_ctrl(cjson_value_analysis_double(params, "x"), 
+        cjson_value_analysis_double(params, "y"), 
+        cjson_value_analysis_double(params, "z"), 
+        cjson_value_analysis_double(params, "rot"));
     return cJSON_CreateNull();
 }
 
