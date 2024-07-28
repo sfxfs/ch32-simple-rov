@@ -73,6 +73,12 @@ void ETH_IRQHandler(void)
     WCHNET_ETHIsr();
 }
 
+extern double rocket_x;
+extern double rocket_y;
+extern double rocket_z;
+extern double rocket_r;
+int rpc_manual_ctrl(double x, double y, double z, double r);
+
 /*********************************************************************
  * @fn      TIM2_IRQHandler
  *
@@ -83,5 +89,6 @@ void ETH_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
     WCHNET_TimeIsr(WCHNETTIMERPERIOD);
+    rpc_manual_ctrl(rocket_x, rocket_y, rocket_z, rocket_r);
     TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 }

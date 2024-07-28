@@ -19,6 +19,12 @@
 #define us2percent(us) (((us)*100.0)/20000.0) // 一个周期 20 ms
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt))) //限幅函数
 
+double rocket_x;
+double rocket_y;
+double rocket_z;
+double rocket_r;
+int rocket_change;
+
 /**
  * @brief ��ȡ json �ڶ�Ӧֵ
  * @param params cjson�ṹ��
@@ -40,10 +46,16 @@ static double cjson_value_analysis_double(cJSON *params,const char *str)
 
 //---------------------------------------------------------------------------------
 
-static int rpc_manual_ctrl(double x, double y, double z, double r)
+int rpc_manual_ctrl(double x, double y, double z, double r)
 {
 //    printf("manual ctrl cmd recv: x|%lf y|%lf z|%lf r|%lf\r\n", x, y, z, r);
-    uvm_motor_write(&default_params, uvm_manual_ctrl(x, y, z, r));
+    static int count = 0;
+    if (count++ > 3 && rocket_change == 1)
+    {
+        uvm_motor_write(&default_params, uvm_manual_ctrl(x, y, z, r));
+        rocket_change = 0;
+        count = 0;
+    }
     return 0;
 }
 
@@ -110,10 +122,11 @@ cJSON *empty_handler(jrpc_context *ctx, cJSON *params, cJSON *id)
 
 cJSON *manual_ctrl(jrpc_context *ctx, cJSON *params, cJSON *id)
 {
-    rpc_manual_ctrl(cjson_value_analysis_double(params, "x"), 
-        cjson_value_analysis_double(params, "y"), 
-        cjson_value_analysis_double(params, "z"), 
-        cjson_value_analysis_double(params, "rot"));
+    rocket_x = cjson_value_analysis_double(params, "x");
+    rocket_y = cjson_value_analysis_double(params, "y");
+    rocket_z = cjson_value_analysis_double(params, "z");
+    rocket_r = cjson_value_analysis_double(params, "rot");
+    rocket_change = 1;
     return cJSON_CreateNull();
 }
 
